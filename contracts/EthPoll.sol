@@ -12,7 +12,7 @@ contract EthPoll {
         bool isActive;
         string avatarUrl;
         string title;
-        string bio;
+        string about;
         uint256 createdTimestamp;
         Proposal[] proposals;
     }
@@ -27,7 +27,7 @@ contract EthPoll {
     event NewPoll(
         string indexed avatarUrl,
         string title,
-        string bio,
+        string about,
         uint256 createdTimestamp
     );
 
@@ -36,7 +36,7 @@ contract EthPoll {
     function createPoll(
         string memory _avatarUrl,
         string memory _title,
-        string memory _bio
+        string memory _about
     ) public {
         require(
             !polls[msg.sender].isActive,
@@ -44,13 +44,13 @@ contract EthPoll {
         );
         totalPolls++;
         polls[msg.sender].isActive = true;
-        overwriteWithNewPoll(_avatarUrl, _title, _bio);
+        overwriteWithNewPoll(_avatarUrl, _title, _about);
     }
 
     function overwriteWithNewPoll(
         string memory _avatarUrl,
         string memory _title,
-        string memory _bio
+        string memory _about
     ) public {
         require(
             polls[msg.sender].isActive,
@@ -59,17 +59,17 @@ contract EthPoll {
         Poll storage poll = polls[msg.sender];
         poll.avatarUrl = _avatarUrl;
         poll.title = _title;
-        poll.bio = _bio;
+        poll.about = _about;
         poll.createdTimestamp = block.timestamp;
         delete poll.proposals;
 
-        emit NewPoll(_avatarUrl, _title, _bio, block.timestamp);
+        emit NewPoll(_avatarUrl, _title, _about, block.timestamp);
     }
 
     function editPoll(
         string memory _avatarUrl,
         string memory _title,
-        string memory _bio
+        string memory _about
     ) public {
         require(
             polls[msg.sender].isActive,
@@ -77,7 +77,7 @@ contract EthPoll {
         );
         polls[msg.sender].avatarUrl = _avatarUrl;
         polls[msg.sender].title = _title;
-        polls[msg.sender].bio = _bio;
+        polls[msg.sender].about = _about;
     }
 
     function propose(address _pollOwnerAddress, string memory _title) public {
