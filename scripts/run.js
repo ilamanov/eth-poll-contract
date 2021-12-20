@@ -1,7 +1,7 @@
 const main = async () => {
   const [owner, randomPerson] = await hre.ethers.getSigners();
 
-  const pollContractFactory = await hre.ethers.getContractFactory("EthPoll");
+  const pollContractFactory = await hre.ethers.getContractFactory("DePoll");
   const pollContract = await pollContractFactory.deploy();
   await pollContract.deployed();
   console.log("Contract deployed to:", pollContract.address);
