@@ -1,6 +1,10 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
+const PROPOSE_COST = 0.0025;
+const UPVOTE_COST = 0.00025;
+const DOWNVOTE_COST = 0.0005;
+
 function checkIfPollIsUndefined(poll) {
   expect(poll.isActive).to.equal(false);
   expect(poll.avatarUrl).to.equal("");
@@ -84,7 +88,9 @@ describe("DePoll contract", function () {
 
         const proposeTxn = await contract
           .connect(addr2)
-          .propose(owner.address, proposalTitle);
+          .propose(owner.address, proposalTitle, {
+            value: ethers.utils.parseEther(PROPOSE_COST.toString()),
+          });
         await proposeTxn.wait();
       });
 
@@ -99,11 +105,25 @@ describe("DePoll contract", function () {
         expect(proposal.downvotes.length).to.equal(0);
       });
 
+      it("Should fail when insufficient funds", async function () {
+        await expect(
+          contract.connect(addr3).propose(owner.address, "Title", {
+            value: ethers.utils.parseEther((2 * PROPOSE_COST).toString()),
+          })
+        ).to.be.revertedWith("invalid amount supplied");
+      });
+
       describe("Voting", function () {
         it("Should correctly upvote", async function () {
+          await expect(
+            contract.connect(addr3).upvote(owner.address, 0)
+          ).to.be.revertedWith("invalid amount supplied");
+
           const upvoteTxn = await contract
             .connect(addr3)
-            .upvote(owner.address, 0);
+            .upvote(owner.address, 0, {
+              value: ethers.utils.parseEther(UPVOTE_COST.toString()),
+            });
           await upvoteTxn.wait();
 
           expect(await contract.getProposalCount(owner.address)).to.equal(

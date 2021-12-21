@@ -5,6 +5,10 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 contract DePoll {
+    uint256 constant PROPOSE_COST = 0.0025 ether;
+    uint256 constant UPVOTE_COST = 0.00025 ether;
+    uint256 constant DOWNVOTE_COST = 0.0005 ether;
+
     mapping(address => Poll) public polls;
 
     struct Poll {
@@ -49,7 +53,11 @@ contract DePoll {
         polls[msg.sender].about = _about;
     }
 
-    function propose(address _pollOwnerAddress, string memory _title) public {
+    function propose(address _pollOwnerAddress, string memory _title)
+        public
+        payable
+    {
+        require(msg.value == PROPOSE_COST, "invalid amount supplied");
         Proposal memory proposal;
         proposal.title = _title;
         proposal.createdBy = msg.sender;
@@ -57,7 +65,11 @@ contract DePoll {
         polls[_pollOwnerAddress].proposals.push(proposal);
     }
 
-    function upvote(address _pollOwnerAddress, uint256 _proposalIndex) public {
+    function upvote(address _pollOwnerAddress, uint256 _proposalIndex)
+        public
+        payable
+    {
+        require(msg.value == UPVOTE_COST, "invalid amount supplied");
         polls[_pollOwnerAddress].proposals[_proposalIndex].upvotes.push(
             msg.sender
         );
@@ -65,7 +77,9 @@ contract DePoll {
 
     function downvote(address _pollOwnerAddress, uint256 _proposalIndex)
         public
+        payable
     {
+        require(msg.value == DOWNVOTE_COST, "invalid amount supplied");
         polls[_pollOwnerAddress].proposals[_proposalIndex].downvotes.push(
             msg.sender
         );
