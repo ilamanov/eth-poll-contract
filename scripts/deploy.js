@@ -5,11 +5,11 @@ const main = async () => {
   console.log("Deploying contracts with account: ", deployer.address);
   console.log("Account balance: ", accountBalance.toString());
 
-  const pollContractFactory = await hre.ethers.getContractFactory("DePoll");
-  const poll = await pollContractFactory.deploy();
-  await poll.deployed();
+  const contractFactory = await hre.ethers.getContractFactory("DePoll");
+  const contract = await contractFactory.deploy();
+  await contract.deployed();
 
-  console.log("DePoll address: ", poll.address);
+  console.log("DePoll address: ", contract.address);
 };
 
 const runMain = async () => {
