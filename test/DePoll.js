@@ -138,5 +138,51 @@ describe("DePoll contract", function () {
         });
       });
     });
+
+    describe("Cycles", function () {
+      beforeEach(async function () {
+        for (let i = 0; i < 3; i++) {
+          const proposeTxn = await contract
+            .connect(addr2)
+            .propose(owner.address, "Let's talk about Solidity" + i, {
+              value: ethers.utils.parseEther(PROPOSE_COST.toString()),
+            });
+          await proposeTxn.wait();
+        }
+      });
+
+      it("should correctly compute proposalRange", async function () {
+        const proposalRange = await contract.getProposalRange(owner.address, 0);
+        expect(proposalRange.length).to.equal(2);
+        expect(proposalRange[0]).to.equal(0);
+        expect(proposalRange[1]).to.equal(3);
+      });
+
+      it("should correctly compute proposalRange2", async function () {
+        const endTxn = await contract.connect(owner).endCycle();
+        await endTxn.wait();
+
+        for (let i = 0; i < 2; i++) {
+          const proposeTxn = await contract
+            .connect(addr2)
+            .propose(owner.address, "Let's talk about Solidity2" + i, {
+              value: ethers.utils.parseEther(PROPOSE_COST.toString()),
+            });
+          await proposeTxn.wait();
+        }
+        const proposalRange = await contract.getProposalRange(owner.address, 0);
+        expect(proposalRange.length).to.equal(2);
+        expect(proposalRange[0]).to.equal(0);
+        expect(proposalRange[1]).to.equal(3);
+
+        const proposalRange2 = await contract.getProposalRange(
+          owner.address,
+          1
+        );
+        expect(proposalRange2.length).to.equal(2);
+        expect(proposalRange2[0]).to.equal(3);
+        expect(proposalRange2[1]).to.equal(5);
+      });
+    });
   });
 });
