@@ -155,6 +155,22 @@ contract DePoll {
         );
     }
 
+    function getCycleCount(address _pollOwnerAddress)
+        public
+        view
+        returns (uint256 count)
+    {
+        return polls[_pollOwnerAddress].cycleCutoffs.length;
+    }
+
+    function getCycleCutoff(address _pollOwnerAddress, uint256 cycleIndex)
+        public
+        view
+        returns (uint256 cutoff)
+    {
+        return polls[_pollOwnerAddress].cycleCutoffs[cycleIndex];
+    }
+
     function getProposalCount(address _pollOwnerAddress)
         public
         view
